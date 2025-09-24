@@ -124,10 +124,10 @@ RUN pip install -U 'git+https://github.com/facebookresearch/fvcore' && \
     pip install -U "git+https://github.com/facebookresearch/segment-anything.git" && \
     pip install ultralytics progressbar
 
-RUN pip install -U "git+https://github.com/openai/CLIP.git" 
+RUN pip install -U "git+https://github.com/openai/CLIP.git"
 
 # install robosuite
-RUN pip install robosuite  
+RUN pip install robosuite
 RUN pip install numba
 # metaworld
 RUN pip install git+https://github.com/Farama-Foundation/Metaworld.git@master#egg=metaworld
@@ -147,12 +147,12 @@ RUN apt-cache search mesa
 # # RUN pip install --upgrade  git+https://github.com/haven-ai/haven-ai
 # # RUN pip install --upgrade notebook==6.4.12 jupyter_contrib_nbextensions && \
 # #     jupyter contrib nbextension install --user && \
-# #     jupyter nbextension enable varInspector/main && \ 
+# #     jupyter nbextension enable varInspector/main && \
 # #     jupyter nbextension enable --py widgetsnbextension
 # # WORKDIR /mnt/home
 # # ENTRYPOINT ["/tk/bin/start.sh"]
 
-# RUN apt install -y sudo 
+# RUN apt install -y sudo
 
 # RUN pip install --force-reinstall torch==2.0.0+cu117 torchvision==0.15.0+cu117 --extra-index-url https://download.pytorch.org/whl/
 
@@ -160,8 +160,8 @@ RUN apt-cache search mesa
 # ARG USE_CUDA=0
 # ENV AM_I_DOCKER True
 # ENV BUILD_WITH_CUDA "${USE_CUDA}"
-# # torch.cuda.get_device_capability(0) = (7, 0) -> TORCH_CUDA_ARCH_LIST "7.0" 
-# ENV TORCH_CUDA_ARCH_LIST "7.0 7.2 8.0 8.6" 
+# # torch.cuda.get_device_capability(0) = (7, 0) -> TORCH_CUDA_ARCH_LIST "7.0"
+# ENV TORCH_CUDA_ARCH_LIST "7.0 7.2 8.0 8.6"
 # ENV CUDA_HOME /usr/local/cuda-11.4/
 
 # RUN pip install wget
@@ -170,5 +170,3 @@ RUN apt-cache search mesa
 
 # RUN pip install mani-skill2
 # RUN pip install numpy==1.23.5
-
-

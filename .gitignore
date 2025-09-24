@@ -1,0 +1,14 @@
+wandb
+.idea/
+__pycache__/
+agent/__pycache__/
+env/__pycache__/
+env/custom_dmc_tasks/__pycache__/
+env/custom_maniskill_tasks/__pycache__/
+env/custom_robosuite_tasks/__pycache__/
+env/tracker/__pycache__/
+env/tracker/inference/__pycache__/
+env/tracker/model/__pycache__/
+env/tracker/tools/__pycache__/
+env/tracker/util/__pycache__/
+exp_local/
