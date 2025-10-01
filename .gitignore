@@ -12,3 +12,4 @@ env/tracker/model/__pycache__/
 env/tracker/tools/__pycache__/
 env/tracker/util/__pycache__/
 exp_local/
+train.sh

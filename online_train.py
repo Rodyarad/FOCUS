@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import comet_ml
 
 os.environ["MKL_SERVICE_FORCE_INTEL"] = "1"
 os.environ["MUJOCO_GL"] = "egl"

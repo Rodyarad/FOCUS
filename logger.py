@@ -1,7 +1,7 @@
 import csv
 import datetime
 from collections import defaultdict
-
+import comet_ml
 import numpy as np
 import torch
 import torchvision
@@ -183,6 +183,7 @@ class Logger(object):
             use_wandb=use_wandb,
         )
         if use_tb:
+            experiment = comet_ml.start()
             self._sw = SummaryWriter(str(log_dir / "tb"))
         else:
             self._sw = None
