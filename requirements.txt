@@ -109,6 +109,7 @@ wrapt==1.17.3
 yacs==0.1.8
 scikit-image==0.18.3
 cython<3.0.0
+moviepy==1.0.3
 h5py
 wget
 mani-skill2

@@ -164,6 +164,7 @@ class Workspace:
         
         while eval_until_episode(episode):
             episode_data = []
+            episode_frames = []
             
             if self.train_target_reach:     
                 # set target before reset of env
@@ -195,6 +196,10 @@ class Workspace:
                 obs["eval_rgb"] = np.concatenate([target_obs["rgb"], obs['rgb']], axis=1)
             
             episode_data.append(obs)
+            
+            fr = self.eval_env.render()
+            episode_frames.append(fr)
+
             agent_state = None
             
             while not bool(obs["is_last"]):
@@ -224,6 +229,9 @@ class Workspace:
                 episode_data.append(obs)
                 total_reward += obs["reward"]
                 step += 1
+
+                fr = self.eval_env.render()
+                episode_frames.append(fr)
                 
                 # Hacky way to say that step_to_success was set
                 if step_to_success == self._horizon and obs["success"]:
@@ -263,6 +271,12 @@ class Workspace:
             log("step", self.global_step)
             if self.train_target_reach:                  
                 utils.log_metrics_dict(move_to_target_metrics, log)
+                        # log eval video for all modes if enabled and frames exist
+            if self.cfg.save_video:
+                frames = [f for f in episode_frames if isinstance(f, np.ndarray)]
+                if len(frames) > 1:
+                    v = np.expand_dims(np.stack(frames, axis=0), axis=0)  # [1, T, C, H, W]
+                    self.logger.log_video({'eval_video': v}, self.global_frame)
 
         if self.train_target_reach:
             # B, T, C, H, W = video.shape
