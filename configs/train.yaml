@@ -53,7 +53,7 @@ num_train_frames: 2000010
 num_seed_frames: 4000
 
 # eval settings
-eval_every_frames: 1000
+eval_every_frames: 10000
 num_eval_episodes: 5
 TSNE_analysis: false
 
