@@ -1,26 +1,28 @@
-# inherit from minimal notebook images provided by gpulab team
-# FROM nvidia/cudagl:11.3.1-devel-ubuntu20.04
 FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04
-# FROM haosulab/mani-skill2:latest
 
-USER root
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget git build-essential ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install base utilities
-RUN apt-get update \
-    && apt-get install -y build-essential \
-    && apt-get install -y wget \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install miniconda
-ENV CONDA_DIR /opt/conda
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda
-
-# Put conda in path so we can use conda activate
+ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
+
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p $CONDA_DIR && \
+    rm ~/miniconda.sh && \
+    conda clean -afy
+
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+ARG ENV_NAME=env
+RUN conda create -y -n $ENV_NAME python=3.9 && conda clean -afy
+ENV PATH=$CONDA_DIR/envs/$ENV_NAME/bin:$PATH
+
+WORKDIR /app
+COPY requirements.txt .
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     bc \
@@ -86,87 +88,20 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-USER $NB_UID
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# additional pip install libraries
-RUN pip --no-cache-dir install --upgrade \
-    gdown \
-    imageio==2.23.0 \
-    imageio-ffmpeg \
-    moviepy \
-    requests \
-    box2d-py \
-    gym==0.25.2 \
-    opencv-python \
-    librosa \
-    line-profiler \
-    pynput \
-    pyquaternion \
-    cached_property \
-    wandb \
-    hydra-core \
-    hydra-submitit-launcher \
-    dm_control \
-    onnx \
-    onnxruntime-gpu
 
-# Install PyTorch packages
-RUN pip install --quiet --no-cache-dir \
-    'torch' \
-    'torchvision' \
-    'torchaudio' \
-    'tensorboard' \
-    -f https://download.pytorch.org/whl/cu116/torch_stable.html
-#    fix-permissions "${CONDA_DIR}" && \
-#    fix-permissions "/home/${NB_USER}"
+RUN pip install git+https://github.com/IDEA-Research/GroundingDINO.git && \
+    pip install git+https://github.com/Farama-Foundation/Metaworld.git@v2.0.0#egg=metaworld && \
+    pip install git+https://github.com/facebookresearch/fvcore && \
+    pip install git+https://github.com/facebookresearch/segment-anything.git && \
+    pip install git+https://github.com/openai/CLIP.git
 
-RUN pip install -U 'git+https://github.com/facebookresearch/fvcore' && \
-    pip install -U "git+https://github.com/facebookresearch/segment-anything.git" && \
-    pip install ultralytics progressbar
+RUN pip install "moviepy==1.0.3" --no-deps
 
-RUN pip install -U "git+https://github.com/openai/CLIP.git"
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
-# install robosuite
-RUN pip install robosuite
-RUN pip install numba
-# metaworld
-RUN pip install git+https://github.com/Farama-Foundation/Metaworld.git@master#egg=metaworld
 
-# enable ssh and porting
-USER root
-EXPOSE 2222
-EXPOSE 6000
-EXPOSE 8088
-ENV LANG=en_US.UTF-8
-ENV PATH /opt/miniconda3/bin:$PATH
-
-RUN apt-cache search mesa
-# RUN apt-get update && apt-get install -y libgl1-mesa-glx libosmesa6 libsm6 libxext6 libxrender-dev
-
-# # haven
-# # RUN pip install --upgrade  git+https://github.com/haven-ai/haven-ai
-# # RUN pip install --upgrade notebook==6.4.12 jupyter_contrib_nbextensions && \
-# #     jupyter contrib nbextension install --user && \
-# #     jupyter nbextension enable varInspector/main && \
-# #     jupyter nbextension enable --py widgetsnbextension
-# # WORKDIR /mnt/home
-# # ENTRYPOINT ["/tk/bin/start.sh"]
-
-# RUN apt install -y sudo
-
-# RUN pip install --force-reinstall torch==2.0.0+cu117 torchvision==0.15.0+cu117 --extra-index-url https://download.pytorch.org/whl/
-
-# # args CUDA+GroundingDINO
-# ARG USE_CUDA=0
-# ENV AM_I_DOCKER True
-# ENV BUILD_WITH_CUDA "${USE_CUDA}"
-# # torch.cuda.get_device_capability(0) = (7, 0) -> TORCH_CUDA_ARCH_LIST "7.0"
-# ENV TORCH_CUDA_ARCH_LIST "7.0 7.2 8.0 8.6"
-# ENV CUDA_HOME /usr/local/cuda-11.4/
-
-# RUN pip install wget
-
-# RUN pip install --no-cache-dir git+https://github.com/IDEA-Research/GroundingDINO.git
-
-# RUN pip install mani-skill2
-# RUN pip install numpy==1.23.5
+CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate env && exec bash"]
