@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# Installation Section
+# in this section, you can install required packages (programs)
+# before installing, you must update the package index
+
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+    wget git build-essential ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
+
+  sudo apt-get update && sudo apt-get install -yq --no-install-recommends \
+      bc \
+      build-essential \
+      cmake \
+      curl \
+      g++ \
+      gfortran \
+      git \
+      libffi-dev \
+      libfreetype6-dev \
+      libhdf5-dev \
+      libjpeg-dev \
+      liblcms2-dev \
+      libopenblas-dev \
+      liblapack-dev \
+      libssl-dev \
+      libtiff5-dev \
+      libwebp-dev \
+      libzmq3-dev \
+      nano \
+      pkg-config \
+      software-properties-common \
+      screen \
+      tmux \
+      unzip \
+      vim \
+      wget \
+      zlib1g-dev \
+      qt5-default \
+      libvtk6-dev \
+      zlib1g-dev \
+      libjpeg-dev \
+      libwebp-dev \
+      libtiff5-dev \
+      libopenexr-dev \
+      libgdal-dev \
+      libdc1394-22-dev \
+      libavcodec-dev \
+      libavformat-dev \
+      libswscale-dev \
+      libtheora-dev \
+      libvorbis-dev \
+      libxvidcore-dev \
+      libx264-dev \
+      yasm \
+      libopencore-amrnb-dev \
+      libopencore-amrwb-dev \
+      libv4l-dev \
+      libxine2-dev \
+      libtbb-dev \
+      libeigen3-dev \
+      doxygen \
+      ffmpeg \
+      zip \
+      swig \
+      rsync \
+      xvfb && \
+      apt-get clean && \
+      apt-get autoremove && \
+      rm -rf /var/lib/apt/lists/*
+  
+  sudo apt install vulkan-utils libvulkan1 vulkan-tools
+  
+  export PATH=~/intel-miniconda3/bin:$PATH
+  export OMP_NUM_THREADS=1
+
+  . /home/rvakhitov/miniconda3/bin/activate
+  conda activate focus
+  echo "conda env=$CONDA_PREFIX"
+
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/rvakhitov/.mujoco/mujoco210/bin
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
+  export MUJOCO_PY_MUJOCO_PATH=/home/rvakhitov/.mujoco/mujoco210
+  
+  cd ../FOCUS
+  export CUDA_VISIBLE_DEVICES=0
+  python online_train.py env=ms task=TurnFaucet agent=focus seed=0 &> output.text
+
